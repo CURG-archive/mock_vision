@@ -1,0 +1,8 @@
+<launch> 
+	<!-- nodes taken from "vision.launch" in the fake_vision group --> 
+
+	<node name="fake_cloud_data" pkg="bci_experiment_launch" type="no_kinect.py"/>
+	<node name="env_poses" pkg="calibration" type="env_setup" />
+	<include file="$(find checkerboard_detection)/launch/kinect_camerapose.launch" />
+
+</launch>
