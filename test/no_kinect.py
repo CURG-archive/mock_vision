@@ -10,7 +10,7 @@ FIXME - Consider adding fake visual data from camera too and maybe unfiltered po
 
 import roslib
 
-roslib.load_manifest('pc_filter')
+#roslib.load_manifest('pc_filter')
 roslib.load_manifest('rosbag')
 roslib.load_manifest('sensor_msgs')
 import sensor_msgs
@@ -20,6 +20,7 @@ import tf
 import pdb
 import time
 import calendar
+
 
 class CloudDataPublisher(object):
     def __init__(self, bag):
@@ -44,7 +45,7 @@ class CloudDataPublisher(object):
         self.tf_msgs = [camera_to_world, rgb_to_rgb_optical, depth_to_depth_optical,
                         camera_link_to_rgb, camera_link_to_depth]
         self.tf_broadcaster = tf.TransformBroadcaster()
-        self.point_cloud_pub = rospy.Publisher(rospy.get_param("cloud_topic","/pc_filter"),sensor_msgs.msg.PointCloud2)
+        self.point_cloud_pub = rospy.Publisher(rospy.get_param("cloud_topic","/pc_filter"), sensor_msgs.msg.PointCloud2)
 
     def publish(self):
         for msg in self.tf_msgs:
@@ -61,7 +62,7 @@ class CloudDataPublisher(object):
 if __name__ == '__main__':
     rospy.init_node('fake_kinect_data')
     loop = rospy.Rate(30)
-    bag = rosbag.Bag(roslib.packages.get_pkg_dir('bci_experiment_launch') +'/scripts/simulate_kinect_data.bag','r')
+    bag = rosbag.Bag(roslib.packages.get_pkg_dir('mock_vision') +'/test/simulate_kinect_data.bag','r')
     cloud_pub = CloudDataPublisher(bag)
     while not rospy.is_shutdown():
         cloud_pub.publish()
