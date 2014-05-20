@@ -23,7 +23,7 @@ import calendar
 
 
 class CloudDataPublisher(object):
-    def __init__(self, bag):
+    def __init__(self, bag, bagged_cloud_topic = '/filtered_pc'):
         def get_tf(parent_frame, child_frame, bag):
             r = bag.read_messages('/tf')
             for recorded_message in r:
@@ -38,8 +38,8 @@ class CloudDataPublisher(object):
         camera_link_to_rgb = get_tf('/camera_link','/camera_rgb_frame',bag)
         camera_link_to_depth = get_tf('/camera_link','/camera_depth_frame',bag)
 
-
-        r = bag.read_messages('/filtered_pc')
+        rospy.loginfo("Bagged cloud topic: %s"%(bagged_cloud_topic))
+        r = bag.read_messages(bagged_cloud_topic)
         self.point_cloud = r.next()[1]
         self.point_cloud.header.stamp.secs = calendar.timegm(time.gmtime())
         self.tf_msgs = [camera_to_world, rgb_to_rgb_optical, depth_to_depth_optical,
@@ -61,9 +61,10 @@ class CloudDataPublisher(object):
 
 if __name__ == '__main__':
     rospy.init_node('fake_kinect_data')
+    bagged_cloud_topic = rospy.get_param('/bagged_cloud_topic','/filtered_pc')
     loop = rospy.Rate(30)
     bag = rosbag.Bag(roslib.packages.get_pkg_dir('mock_vision') +'/test/simulate_kinect_data.bag','r')
-    cloud_pub = CloudDataPublisher(bag)
+    cloud_pub = CloudDataPublisher(bag, bagged_cloud_topic)
     while not rospy.is_shutdown():
         cloud_pub.publish()
         loop.sleep()
